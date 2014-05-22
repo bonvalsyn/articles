@@ -1,0 +1,59 @@
+                 Report of V.V.Syniavskyi, 19.05.2014. 
+   
+   I built math model of Riak system (first variant, the simplest).
+   Let  a finite set D is  the  set of nodes(servers), d = |D| - the number
+   of elements(nodes),
+S[i], i = 1,2,...,u  - subsets of D ( "S[i] (<= D" ), and union of S[i] is  D,
+"D = (U[i:1-u] S[i]". S[i], i = 1,2,...,u  is the covering of D.
+       C[i], i = 1,2,...,u  is a complete graph with vertices from S[i](cluster).
+	    Let  a finite set Q is  the  set of  Riak objects.
+		Every object o is a tuple:
+           o = (K, B, VC, (k,v)),
+ where K is a key, B is a bucket, VC is a vector clock,
+ (k,v) - key/value pair.
+   Key/value pairs are information atoms of Riak system.
+   Riak is based on "eventual consistency" model. The main rule of it is:
+"high availability in exchange for possibly outdated information"
+(based of  Brewer's theorem).
+   That is why we believe, that every node v from cluster C, has information
+about all 'read' objects, and must return value v of pair (k,v)
+ as reply to user's 'get' request  with key k.
+ Here  the pair (k,v) is from object o with the latest VC value
+ ( this is 100%  AVAILABILITY).
+ Even more, every node v from C  has 'work_table' - T[v].
+ T[v] is a set of pairs :
+
+    T[v] = { (o,n) | o (- Q, n <= N}
+
+Where N is parametre from bucket, which is equal  a number of coppy of objects,
+ which were produced by ring.
+When n >= K, K - quorum number from  the bucket, it is all right.
+ Otherwise can be 'outdated information'.
+   Now, as an example of application of our model,
+   we shall investigate how a value of a number of servers
+   in  a cluster influences on the consistency. 
+   Let p is probability that one object can be wrong. 
+   If the namber of the nodes in cluster is l ( l = |C| ),
+   then we can take N = l, K = (l+1)/2, (l is odd).
+   It is not difficult to prove,  that the probability of 'outdated information'
+   will be
+   
+           Prb = (n!• p™ )/(((l+1)/2)!•((l-1)/2)!), where ™ = (l+1)/2.
+		   
+		   If l = 1, then Prb = p;     and   if p = 0,01,
+            then Prb = 0,01.
+		   
+		   if l = 3, then Prb = 3pp;  and    if p = 0,01,
+		   then Prb = 0,0003.
+		   
+		   if l = 5, then Prb =  10ppp; and   if p = 0 01,
+		   then Prb = 0,00001.
+
+		   if l = 7, then Prb = 120pppp; and  if p = 0,001,
+		   then Prb = 0,0000012.
+		   
+		   ...
+		   
+		   if l = 21, then prb = 3879876pppppppppp  then,
+		   Prb = 0,00000000000004. 
+		   
