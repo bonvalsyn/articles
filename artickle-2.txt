@@ -1,0 +1,30 @@
+Report of V.V.Sinyavskiy 26.05.2014.
+            More detail formula for probability of 'outdated information' for RIAK system.
+     In last report I assumed, that  probability of a failed  object is
+rather small, about p = 0,01 and smaller and  have discarded from
+the formula members with decreasing level more then two (p{3} (p-cube)) and so on.
+    But, when we consider big RIAK information objects, the value
+of p, I think, may be about p = 0,1 or greater, we must take all
+members in formula and we get
+                   Prb(l,p) = Sum[((l+1)/2)<i<(l+1)]C[l :i]]p{i}(1-p){l-i} .
+Here l  is a number  of servers.
+    Let's solve the inequality
+                           Sum[((l+1)/2)<i<(l+1)]C[l :i]]p{i}(1-p){l-i} <= p
+The decision is
+                                      p <= 1/2
+    CONCLUSION. When p is near or greater then  1/2 , a copying  a big RIAK
+objects don't leads  to decreasing of outdated information
+ and even increases  a probability of one, when p>1/2.
+    Let's consider the case p=0,01. By applying our formulla, we get
+1) l=1,  Prb = p = 0,1.
+
+2)l =3,      Prb = C[3:2]p{2}(1-p) + C[3:3]p{3} =
+             3 • 0,01 • 0,9 + 0,001 = 0,028
+
+3)l=5, Prb=C[5:3]p{3}(1-p){2} +  C[5:4]p{4}p + p{5} =
+        0,0081+0,00009+0,000001 ~ 0,009.
+
+...
+
+ l=21,  Prb < 0,000000000003=10{12}		
+		
